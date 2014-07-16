@@ -7,6 +7,9 @@ Pod::Spec.new do |spec|
   		      	'Jacco Taal' => 'jacco.taal@gmail.com' }
   spec.summary      = <<-EOF
 This is a basic library to extend AVQueuePlayer to provide the ability to play previous items (IE move backwards in the queue). This is impossible with the normal AVQueuePlayer, since when an item is finished playing it is removed from the queue for good. This class gets around that by maintaining a copy of the array of the array used to initialize the queue and keeping an index integer, and re-populating the queue from the previous item when the 'play previous song' message is sent. This is useful if you want a more-or-less fully fledged music player, but do not want to use MPMediaPlayer for whatever reason.
+EOF
+  spec.description  = <<-EOF
+This is a basic library to extend AVQueuePlayer to provide the ability to play previous items (IE move backwards in the queue). This is impossible with the normal AVQueuePlayer, since when an item is finished playing it is removed from the queue for good. This class gets around that by maintaining a copy of the array of the array used to initialize the queue and keeping an index integer, and re-populating the queue from the previous item when the 'play previous song' message is sent. This is useful if you want a more-or-less fully fledged music player, but do not want to use MPMediaPlayer for whatever reason.
 
 It should be noted that since this class both maintains a copy of the array used to create it and re-creates the queue when necessary, this class uses a bit more memory than the normal AVQueuePlayer, and requesting a previous song can be slow. In testing we have found this imperceptible unless the array of items you're initializing is gigantic, but if it's vital that your app squeezes out every bit of performance possible; or you do not need to be able to play a previous song, we recommend that you use AVQueuePlayer instead
 

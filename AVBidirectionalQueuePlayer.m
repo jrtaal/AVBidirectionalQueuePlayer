@@ -56,7 +56,7 @@
     // It should be noted that if the player is on its first item, this function will do nothing. It will
     // not restart the item or anything like that; if you want that functionality you can implement it
     // yourself fairly easily using the isAtBeginning method to test if the player is at its start.
-    int tempNowPlayingIndex = [_itemsForPlayer indexOfObject: self.currentItem];
+    NSUInteger tempNowPlayingIndex = [_itemsForPlayer indexOfObject: self.currentItem];
 
     if (tempNowPlayingIndex>0){
         [self pause];
@@ -86,7 +86,7 @@
     }
 }
 
--(int)currentIndex
+-(NSUInteger)currentIndex
 {
     // This method simply returns the now playing index
     return [_itemsForPlayer indexOfObject:self.currentItem];

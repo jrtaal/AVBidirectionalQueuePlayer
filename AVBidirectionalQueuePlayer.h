@@ -27,9 +27,9 @@
 
 -(void)playPreviousItem;
 
--(Boolean)isAtBeginning;
+-(BOOL)isAtBeginning;
 
--(int)currentIndex;
+-(NSUInteger)currentIndex;
 
 
 

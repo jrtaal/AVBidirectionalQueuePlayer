@@ -34,7 +34,7 @@ CHANGES
 2014/07/16  (JRTaal) Greatly simplified and cleaned up code, meanwhile fixed number of bugs.
                      Renamed to more apt AVBidirectionalQueuePlayer'
 EOF
-  spec.source       = { :git => 'https://github.com/jrtaal/AVQueuePlayerPrevious.git', :tag => '1.0' }
+  spec.source       = { :git => 'https://github.com/jrtaal/AVQueuePlayerPrevious.git', :tag => '1.0.1' }
   spec.source_files = '*.{h,m}'
   spec.framework    = 'AVFoundation'
   spec.requires_arc = true

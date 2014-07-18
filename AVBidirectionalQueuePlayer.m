@@ -20,7 +20,7 @@
 
 -(void)setItemsForPlayer:(NSMutableArray *)itemsForPlayer {
     [self removeAllItems];
-    _itemsForPlayer = itemsForPlayer;
+    _itemsForPlayer = [itemsForPlayer mutableCopy];
     for (AVPlayerItem * item in itemsForPlayer) {
         [super insertItem:item afterItem:nil];
     }
@@ -56,7 +56,7 @@
     // It should be noted that if the player is on its first item, this function will do nothing. It will
     // not restart the item or anything like that; if you want that functionality you can implement it
     // yourself fairly easily using the isAtBeginning method to test if the player is at its start.
-    NSUInteger tempNowPlayingIndex = [_itemsForPlayer indexOfObject: self.currentItem];
+    int tempNowPlayingIndex = [_itemsForPlayer indexOfObject: self.currentItem];
 
     if (tempNowPlayingIndex>0){
         [self pause];
@@ -86,7 +86,7 @@
     }
 }
 
--(NSUInteger)currentIndex
+-(int)currentIndex
 {
     // This method simply returns the now playing index
     return [_itemsForPlayer indexOfObject:self.currentItem];

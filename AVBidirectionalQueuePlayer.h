@@ -18,20 +18,28 @@
 
 #import <AVFoundation/AVFoundation.h>
 
+#define AVPlayerItemDidAddItem @"com.bitnomica.AVBidirectionalQueuePlayer.DidAddItem"
+#define AVPlayerItemDidRemoveItem @"com.bitnomica.AVBidirectionalQueuePlayer.DidRemoveItem"
+
 @interface AVBidirectionalQueuePlayer : AVQueuePlayer
 
 
 @property (nonatomic, strong) NSMutableArray *itemsForPlayer;
 
+@property () NSUInteger currentIndex;
 // Two methods need to be added to the AVQueuePlayer: one which will play the last item in the queue, and one which will return if the queue is at the beginning (in case the user wishes to implement special behavior when a queue is at its first item, such as restarting a item). A getIndex method to return the current index is also provided.
 
 -(void)playPreviousItem;
 
--(Boolean)isAtBeginning;
-
--(int)currentIndex;
+-(BOOL)isAtBeginning;
 
 
+-(CMTime) estimatedTotalDuration;
+
+-(CMTime) currentTimeOffsetInQueue;
+-(void) seekToTimeInQueue:(CMTime)time completionHandler:(void (^)(BOOL))completionHandler;
+
+-(void)setCurrentIndex:(NSUInteger)currentIndex   completionHandler:(void (^)(BOOL)) completionHandler;
 
 /* The following methods of AVQueuePlayer are overridden by AVQueuePlayerPrevious:
  – initWithItems: to keep track of the array used to create the player

@@ -60,30 +60,45 @@
 // NEW METHODS
 
 
+
 -(void)playPreviousItem
 {
-    // This function is the meat of this library: it allows for going backwards in an AVQueuePlayer,
-    // basically by clearing the player and repopulating it from the index of the last item played.
-    // It should be noted that if the player is on its first item, this function will do nothing. It will
-    // not restart the item or anything like that; if you want that functionality you can implement it
-    // yourself fairly easily using the isAtBeginning method to test if the player is at its start.
+        // This function is the meat of this library: it allows for going backwards in an AVQueuePlayer,
+        // basically by clearing the player and repopulating it from the index of the last item played.
+        // It should be noted that if the player is on its first item, this function will do nothing. It will
+        // not restart the item or anything like that; if you want that functionality you can implement it
+        // yourself fairly easily using the isAtBeginning method to test if the player is at its start.
     NSUInteger tempNowPlayingIndex = [_itemsForPlayer indexOfObject: self.currentItem];
 
     if (tempNowPlayingIndex>0){
-        [self pause];
-        // Note: it is necessary to have seekToTime called twice in this method, once before and once after re-making the area. If it is not present before, the player will resume from the same spot in the next item when the previous item finishes playing; if it is not present after, the previous item will be played from the same spot that the current item was on.
+            // dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+
+        float currentrate = self.rate;
+        if (currentrate>0)
+            [self pause];
+            // Note: it is necessary to have seekToTime called twice in this method, once before and once after re-making the area. If it is not present before, the player will resume from the same spot in the next item when the previous item finishes playing; if it is not present after, the previous item will be played from the same spot that the current item was on.
         [self seekToTime:kCMTimeZero toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
-        // The next two lines are necessary since RemoveAllItems resets both the nowPlayingIndex and _itemsForPlayer
+            // The next two lines are necessary since RemoveAllItems resets both the nowPlayingIndex and _itemsForPlayer
         NSMutableArray *tempPlaylist = [[NSMutableArray alloc]initWithArray:_itemsForPlayer];
         [super removeAllItems];
-        for (NSUInteger i = tempNowPlayingIndex - 1; i < [tempPlaylist count]; i++) {
+
+        NSInteger offset = 1;
+        while (true) {
+            AVPlayerItem * _it = [tempPlaylist objectAtIndex:tempNowPlayingIndex - offset] ;
+            if (_it.error)
+                offset++;
+            break;
+        }
+        for (NSUInteger i = tempNowPlayingIndex - offset; i < [tempPlaylist count]; i++) {
             [super insertItem:[tempPlaylist objectAtIndex:i] afterItem:nil];
         }
-        // Not a typo; see above comment
+            // Not a typo; see above comment
         [self seekToTime:kCMTimeZero toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
-        [self play];
+        self.rate = currentrate;
+            // });
     }
 }
+
 
 -(BOOL)isAtBeginning
 {
@@ -109,7 +124,7 @@
 -(void)setCurrentIndex:(NSUInteger)currentIndex   completionHandler:(void (^)(BOOL)) completionHandler {
     NSUInteger tempNowPlayingIndex = [_itemsForPlayer indexOfObject: self.currentItem];
 
-    if (tempNowPlayingIndex>0){
+    if (tempNowPlayingIndex>=0){
         [self pause];
             // Note: it is necessary to have seekToTime called twice in this method, once before and once after re-making the area. If it is not present before, the player will resume from the same spot in the next item when the previous item finishes playing; if it is not present after, the previous item will be played from the same spot that the current item was on.
         [self seekToTime:kCMTimeZero toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];

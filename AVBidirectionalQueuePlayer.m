@@ -70,7 +70,7 @@
         // yourself fairly easily using the isAtBeginning method to test if the player is at its start.
     NSUInteger tempNowPlayingIndex = [_itemsForPlayer indexOfObject: self.currentItem];
 
-    if (tempNowPlayingIndex>0){
+    if (tempNowPlayingIndex>0 && tempNowPlayingIndex != NSNotFound){
             // dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
 
         float currentrate = self.rate;
@@ -79,7 +79,7 @@
             // Note: it is necessary to have seekToTime called twice in this method, once before and once after re-making the area. If it is not present before, the player will resume from the same spot in the next item when the previous item finishes playing; if it is not present after, the previous item will be played from the same spot that the current item was on.
         [self seekToTime:kCMTimeZero toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
             // The next two lines are necessary since RemoveAllItems resets both the nowPlayingIndex and _itemsForPlayer
-        NSMutableArray *tempPlaylist = [[NSMutableArray alloc]initWithArray:_itemsForPlayer];
+        NSArray *tempPlaylist = [[NSArray alloc]initWithArray:_itemsForPlayer];
         [super removeAllItems];
 
         NSInteger offset = 1;
@@ -90,7 +90,9 @@
             break;
         }
         for (NSUInteger i = tempNowPlayingIndex - offset; i < [tempPlaylist count]; i++) {
-            [super insertItem:[tempPlaylist objectAtIndex:i] afterItem:nil];
+            AVPlayerItem * item = [tempPlaylist objectAtIndex:i];
+            NSLog(@"Inserting item %@ at %i of %i", item, i, [tempPlaylist count]);
+            [super insertItem:item afterItem:nil];
         }
             // Not a typo; see above comment
         [self seekToTime:kCMTimeZero toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
@@ -121,17 +123,17 @@
 -(void)setCurrentIndex:(NSUInteger)currentIndex {
     [self setCurrentIndex:currentIndex completionHandler:nil];
 }
--(void)setCurrentIndex:(NSUInteger)currentIndex   completionHandler:(void (^)(BOOL)) completionHandler {
+-(void)setCurrentIndex:(NSUInteger)newCurrentIndex   completionHandler:(void (^)(BOOL)) completionHandler {
     NSUInteger tempNowPlayingIndex = [_itemsForPlayer indexOfObject: self.currentItem];
 
-    if (tempNowPlayingIndex>=0){
+    if (tempNowPlayingIndex != NSNotFound){
         [self pause];
             // Note: it is necessary to have seekToTime called twice in this method, once before and once after re-making the area. If it is not present before, the player will resume from the same spot in the next item when the previous item finishes playing; if it is not present after, the previous item will be played from the same spot that the current item was on.
         [self seekToTime:kCMTimeZero toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
             // The next two lines are necessary since RemoveAllItems resets both the nowPlayingIndex and _itemsForPlayer
-        NSMutableArray *tempPlaylist = [[NSMutableArray alloc]initWithArray:_itemsForPlayer];
+        NSArray *tempPlaylist = [[NSArray alloc]initWithArray:_itemsForPlayer];
         [super removeAllItems];
-        for (NSUInteger i = currentIndex; i < [tempPlaylist count]; i++) {
+        for (NSUInteger i = newCurrentIndex; i < [tempPlaylist count]; i++) {
             [super insertItem:[tempPlaylist objectAtIndex:i] afterItem:nil];
         }
             // Not a typo; see above comment
@@ -171,7 +173,7 @@
     // proper location in the itemsForPlayer array and increments the nowPlayingIndex if necessary.
     [super insertItem:item afterItem:afterItem];
     if (CMTIME_IS_NUMERIC(item.duration)) {
-        NSLog(@"duration: %5.2f", item.duration.value*1.0/item.duration.timescale);
+        NSLog(@"duration: %5.2f", (double) CMTimeGetSeconds(item.duration));
         if (CMTimeCompare(_estimatedDuration, kCMTimeZero) == 0)
             _estimatedDuration = item.duration;
         else
